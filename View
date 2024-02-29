@@ -1,0 +1,8 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>joe's privacy policy..! &#x1F355;</p>
+    
+    
