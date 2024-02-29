@@ -1,0 +1,92 @@
+using Microsoft.AspNetCore.Mvc;
+using Pizza_Phase4.Models;
+
+namespace Pizza_Phase4.Controllers
+{
+    public class PizzaController : Controller
+    {
+        static public List<Pizza> pizzadetails = new List<Pizza>() {
+
+                new Pizza { PizzaId = 100,Type = "chicago", Price =250},
+                new Pizza { PizzaId = 101,Type = "california",Price=300},
+                new Pizza { PizzaId = 102,Type = "Pepperoni",Price=450}
+            };
+        static public List<OrderInfo> orderdetails = new List<OrderInfo>();
+
+        public string? pizza { get; private set; }
+
+        public IActionResult Index()
+        {
+            return View(pizzadetails);
+        }
+        public IActionResult Cart(int id)
+        {
+            var found = (pizzadetails.Find(p => p.PizzaId == id));
+
+            TempData["id"] = id;
+
+            return View(found);
+        }
+        [HttpPost]
+        public IActionResult Cart(IFormCollection f)
+        {
+            Random r = new Random();
+            int id = Convert.ToInt32(TempData["id"]);
+            OrderInfo o = new OrderInfo();
+            var found = (pizzadetails.Find(p => p.PizzaId == id));
+            o.OrderId = r.Next(100, 999);
+            o.PizzaId = id;
+           
+            o.Price = found.Price;
+            o.Type = found.Type;
+            o.Quantity = found.Quantity;
+            o.Quantity = Convert.ToInt32(Request.Form["qty"]);
+            o.TotalPrice = o.Price * o.Quantity;
+
+            orderdetails.Add(o);
+
+            return RedirectToAction("Checkout");
+
+        }
+        public IActionResult Checkout()
+        {
+
+
+            return View(orderdetails);
+
+        }
+        public IActionResult Buy()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            Pizza p = pizzadetails.SingleOrDefault(e =>e.PizzaId == id);
+            return View(pizza);
+        }
+        [HttpPost]
+        public IActionResult Delete(int? id)
+        {
+            Pizza p = pizzadetails.SingleOrDefault(e => e.PizzaId== id);
+            if(p!=null)
+            {
+                pizzadetails.Remove(p);
+
+            }
+            return RedirectToAction("Index");
+        }
+        public  List<Pizza> DisplayAll()
+        {
+            return pizzadetails;
+        }
+        public List<Pizza> pizzaByid(int id)
+        {
+            List<Pizza> pizza = pizzadetails.FindAll(e => e.PizzaId == id);
+            return pizza;
+        }
+
+        
+    }
+}
+    
